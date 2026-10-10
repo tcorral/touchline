@@ -1,0 +1,29 @@
+.manual-nav{display:flex;align-items:center;gap:22px}
+.manual-nav a{font-size:13px;color:#d7dfd4;text-decoration:none}
+.manual-nav a:hover,.manual-nav a:focus-visible{color:var(--lime)}
+.manual-main{max-width:1080px}
+.manual-heading{padding-bottom:30px}
+.manual-heading .heading-note{max-width:360px}
+.manual-section{padding:25px 0 28px;border-bottom:1px solid var(--line);line-height:1.65}
+.manual-title{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.manual-section p{max-width:850px;margin:0 0 12px;color:#c3cec3;font-size:14px}
+.manual-section strong{color:var(--ink)}
+.quick-start,.advice-list{margin:0;padding:0;list-style:none;counter-reset:manual;max-width:900px}
+.quick-start{counter-reset:quick}
+.quick-start li,.advice-list li{position:relative;padding:10px 0 10px 38px;border-top:1px solid #26392c;color:#c3cec3;font-size:14px}
+.quick-start li{counter-increment:quick}
+.quick-start li::before{content:counter(quick,decimal-leading-zero);position:absolute;left:0;top:10px;color:var(--lime);font:700 13px 'Barlow Condensed',sans-serif}
+.manual-definitions{margin:14px 0 0;max-width:900px}
+.manual-definitions>div{display:grid;grid-template-columns:minmax(145px,200px) 1fr;gap:18px;padding:11px 0;border-top:1px solid #26392c}
+.manual-definitions dt{color:var(--lime);font-size:13px;font-weight:700}
+.manual-definitions dd{margin:0;color:#c3cec3;font-size:14px;line-height:1.55}
+.step-guide{display:grid;grid-template-columns:1fr 1fr;column-gap:34px;margin-top:14px}
+.step-guide article{padding:15px 0 12px;border-top:1px solid #34473b}
+.step-guide h3{margin:0 0 6px;color:#e8eddf;font:600 19px 'Barlow Condensed',sans-serif}
+.step-guide p{margin:0;font-size:13px}
+.manual-callout{margin-top:20px!important;padding:13px 15px;border-left:2px solid var(--amber);background:#17251c}
+.manual-save{border-bottom:0}
+.manual-button{display:inline-block;margin-top:8px;padding:10px 14px;border:1px solid #607363;border-radius:3px;color:var(--ink);font-size:12px;font-weight:700;text-decoration:none}
+.manual-button:hover{border-color:var(--lime);color:var(--lime)}
+@media(max-width:700px){.manual-nav{gap:12px}.manual-nav a{font-size:12px}.step-guide{grid-template-columns:1fr}.manual-definitions>div{grid-template-columns:1fr;gap:3px}.manual-heading{display:block}}
+@media(max-width:420px){.manual-nav{gap:8px}.manual-nav a{font-size:11px}.brand{gap:7px}}

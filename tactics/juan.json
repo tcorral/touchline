@@ -1,0 +1,24 @@
+{
+  "name": "Real Juan",
+  "colors": ["#ffffff", "#ffffff", "#000000"],
+  "formation": [
+    [-150, 0, 6],
+    [-120, -30, 7],
+    [-120, 30, 7],
+    [-100, 0, 6],
+    [-100, 50, 6],
+    [-60, 0, 4],
+    [-20, -40, 4],
+    [0, 0, 4],
+    [50, 50, 6],
+    [100, 50, 6],
+    [120, -50, 6]
+  ],
+  "steps": [
+    {"op": "formation"},
+    {"op": "keeper"},
+    {"op": "defend"},
+    {"op": "chase"},
+    {"op": "pass-or-shoot", "whenXBelow": 80, "deviation": 0}
+  ]
+}

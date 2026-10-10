@@ -1,0 +1,33 @@
+{
+  "name": "F.C. Pepe",
+  "colors": ["#ffc800", "#ff80ff", "#000000"],
+  "formation": [
+    [-150, 0, 6],
+    [-120, -30, 7],
+    [-120, 30, 7],
+    [-100, 0, 6],
+    [-100, 50, 6],
+    [-60, 0, 4],
+    [-20, -40, 4],
+    [0, 0, 4],
+    [50, 50, 6],
+    [100, 50, 6],
+    [120, -50, 6]
+  ],
+  "steps": [
+    {"op": "formation"},
+    {"op": "chase"},
+    {"op": "keeper"},
+    {"op": "pass", "from": 0, "to": 1},
+    {"op": "pass", "from": 1, "to": 3},
+    {"op": "pass", "from": 2, "to": 4},
+    {"op": "pass", "from": 3, "to": 5},
+    {"op": "pass", "from": 4, "to": 6},
+    {"op": "pass", "from": 5, "to": 8},
+    {"op": "pass", "from": 6, "to": 10},
+    {"op": "pass", "from": 7, "to": 9},
+    {"op": "pass", "from": 8, "to": 9},
+    {"op": "shoot", "player": 9, "deviation": 10},
+    {"op": "shoot", "player": 10, "deviation": -10}
+  ]
+}

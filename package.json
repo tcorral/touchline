@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "name": "futbol-reconstruction",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && javac -classpath ../build/classes -d test/classes test/OriginalOracle.java test/BoundaryOracle.java && node test/differential.mjs",
+    "start": "python3 -m http.server 8080 --bind 127.0.0.1"
+  }
+}
