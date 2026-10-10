@@ -6,7 +6,6 @@ const audio = new GameAudio();
 const audioButton = document.querySelector('#audio-toggle');
 let audioHint = 'on';
 function paintAudio() { audioButton.textContent = audioHint === 'on' ? t('soundOn') : audioHint === 'tap' ? t('soundTap') : t('soundOff'); }
-document.querySelector('#create-tactic').addEventListener('click', () => { window.location.href = 'tactics.html'; });
 const gameControl = document.querySelector('#game-control');
 async function enableAudio() { try {
     await audio.enable();
@@ -75,20 +74,39 @@ const FIELD_X_SCALE = 1.5, FIELD_Y_SCALE = 4 / 3;
 const toCanvas = (x, y) => ({ x: 300 + x * FIELD_X_SCALE, y: 200 + y * FIELD_Y_SCALE });
 const fromCanvas = (x, y) => ({ x: (x - 300) / FIELD_X_SCALE, y: (y - 200) / FIELD_Y_SCALE });
 const selectA = document.querySelector('#a'), selectB = document.querySelector('#b');
+const LOAD_TACTIC = '__load__';
 const tacticMessage = document.querySelector('#tactic-message');
 const tacticFile = document.querySelector('#tactic-file');
 const library = [];
+const previousTactic = new WeakMap();
+let pendingLoad = null;
 let tacticNotice = null, tacticNoticeError = false;
 function showTacticMessage(text, error = false) { tacticNotice = text; tacticNoticeError = error; tacticMessage.hidden = false; tacticMessage.textContent = text(); tacticMessage.classList.toggle('error', error); }
 function clearTacticMessage() { tacticNotice = null; tacticMessage.hidden = true; tacticMessage.textContent = ''; tacticMessage.classList.remove('error'); }
+function loadTacticOption(select) {
+    let option = [...select.options].find(item => item.value === LOAD_TACTIC);
+    if (!option) {
+        option = document.createElement('option');
+        option.value = LOAD_TACTIC;
+        option.dataset.i18n = 'loadTactic';
+        select.append(option);
+    }
+    option.textContent = t('loadTactic');
+    return option;
+}
 function rememberTactic(id, tactic) {
     library.push({ id, tactic });
     for (const select of [selectA, selectB]) {
         const option = document.createElement('option');
         option.value = id;
         option.textContent = tactic.name;
-        select.append(option);
+        select.insertBefore(option, [...select.options].find(item => item.value === LOAD_TACTIC) ?? null);
     }
+}
+function restoreTacticSelect(select) {
+    const previous = previousTactic.get(select);
+    const fallback = [...select.options].find(option => option.value !== LOAD_TACTIC)?.value ?? '';
+    select.value = previous && previous !== LOAD_TACTIC ? previous : fallback;
 }
 function selectedTactic(select) {
     const found = library.find(item => item.id === select.value);
@@ -126,7 +144,7 @@ function rebuildPlayerSheets() {
 }
 [playerBase, shirtMask, shortsMask].forEach(img => img.addEventListener('load', () => { if (game)
     rebuildPlayerSheets(); }));
-function reset() { if (!library.length)
+function reset() { if (!library.length || selectA.value === LOAD_TACTIC || selectB.value === LOAD_TACTIC)
     return; clearTacticMessage(); audio.stopMusic(); winnerBanner.hidden = true; winnerName.textContent = ''; goalAnimationUntil = 0; goalAnimationStarted = 0; kickoffWhistled = false; fulltimeWhistled = false; game = new Game(new Match([selectedTactic(selectA), selectedTactic(selectB)])); rebuildPlayerSheets(); homeName.textContent = game.match.tactics[0].name; awayName.textContent = game.match.tactics[1].name; updateMatchDisplay(); paused = false; gameControl.textContent = t('pause'); waitUntil = performance.now() + 6000; lastTick = waitUntil; if (audio.enabled)
     audio.startMusic(); }
 function refreshMatchChrome() {
@@ -150,6 +168,8 @@ function refreshMatchChrome() {
         tacticMessage.textContent = tacticNotice();
         tacticMessage.classList.toggle('error', tacticNoticeError);
     }
+    for (const select of [selectA, selectB])
+        loadTacticOption(select);
 }
 gameControl.addEventListener('click', () => {
     if (game && !game.finished) {
@@ -165,21 +185,39 @@ gameControl.addEventListener('click', () => {
     }
     reset();
 });
-document.querySelector('#load-tactic').addEventListener('click', () => tacticFile.click());
+for (const select of [selectA, selectB])
+    select.addEventListener('change', () => {
+        if (select.value !== LOAD_TACTIC) {
+            previousTactic.set(select, select.value);
+            return;
+        }
+        pendingLoad = select;
+        tacticFile.click();
+    });
+tacticFile.addEventListener('cancel', () => { const select = pendingLoad; pendingLoad = null; if (select)
+    restoreTacticSelect(select); });
 tacticFile.addEventListener('change', async () => {
+    const select = pendingLoad;
+    pendingLoad = null;
     const file = tacticFile.files?.[0];
     tacticFile.value = '';
-    if (!file)
+    if (!select)
         return;
+    if (!file) {
+        restoreTacticSelect(select);
+        return;
+    }
     try {
         const tactic = loadTactic(JSON.parse(await file.text()));
         const id = `device:${file.name}:${library.length}`;
         rememberTactic(id, tactic);
-        selectA.value = id;
-        showTacticMessage(() => t('loadedHome', { name: tactic.name }));
+        select.value = id;
+        previousTactic.set(select, id);
+        showTacticMessage(() => t(select === selectA ? 'loadedHome' : 'loadedAway', { name: tactic.name }));
     }
     catch (error) {
         console.error(error);
+        restoreTacticSelect(select);
         showTacticMessage(() => error instanceof SyntaxError ? t('invalidJson') : error instanceof Error ? error.message : t('couldNotLoadTactic'), true);
     }
 });
@@ -468,7 +506,12 @@ async function loadBuiltInTactics() {
     catch (error) {
         console.warn('Could not load saved tactics.', error);
     }
+    selectA.value = BUILTIN_TACTICS[0];
     selectB.value = BUILTIN_TACTICS[1];
+    for (const select of [selectA, selectB]) {
+        loadTacticOption(select);
+        previousTactic.set(select, select.value);
+    }
 }
 onLocaleChange(refreshMatchChrome);
 loadBuiltInTactics().then(() => { document.querySelector('#status').textContent = t('ready'); requestAnimationFrame(frame); }).catch(error => { console.error(error); showTacticMessage(() => t('missingBuiltin'), true); });
