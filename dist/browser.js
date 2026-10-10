@@ -1,23 +1,29 @@
 import { Game, Match } from './engine.js';
 import { GameAudio } from './audio.js';
 import { BUILTIN_TACTICS, loadTactic } from './tactics.js';
+import { onLocaleChange, t } from './i18n.js';
 const audio = new GameAudio();
 const audioButton = document.querySelector('#audio-toggle');
+let audioHint = 'on';
+function paintAudio() { audioButton.textContent = audioHint === 'on' ? t('soundOn') : audioHint === 'tap' ? t('soundTap') : t('soundOff'); }
 document.querySelector('#create-tactic').addEventListener('click', () => { window.location.href = 'tactics.html'; });
 const gameControl = document.querySelector('#game-control');
 async function enableAudio() { try {
     await audio.enable();
-    audioButton.textContent = '🔊 Sound on';
+    audioHint = 'on';
+    paintAudio();
     if (game && !paused && !game.finished)
         audio.startMusic();
 }
 catch (error) {
     console.error(error);
-    audioButton.textContent = 'Tap to enable sound';
+    audioHint = 'tap';
+    paintAudio();
 } }
 audioButton.addEventListener('click', () => { if (audio.enabled) {
     audio.disable();
-    audioButton.textContent = '🔇 Enable sound';
+    audioHint = 'off';
+    paintAudio();
 }
 else
     void enableAudio(); });
@@ -55,13 +61,13 @@ function updateMatchDisplay() {
     timer.textContent = game.clock;
     if (game.finished && winnerBanner.hidden) {
         const winner = game.match.winner();
-        winnerLabel.textContent = winner === null ? 'MATCH DRAW' : 'MATCH WINNER';
-        winnerName.textContent = winner === null ? 'No winner' : game.match.tactics[winner].name;
+        winnerLabel.textContent = winner === null ? t('draw') : t('winner');
+        winnerName.textContent = winner === null ? t('noWinner') : game.match.tactics[winner].name;
         winnerTrophy.textContent = winner === null ? '' : '🏆';
         winnerBanner.hidden = false;
     }
     if (game.finished)
-        gameControl.textContent = 'Start';
+        gameControl.textContent = t('start');
 }
 // Simulation coordinates span x=-160..160 and y=-120..120.
 // Map those limits to the actual pitch lines in the 600x400 background.
@@ -72,8 +78,9 @@ const selectA = document.querySelector('#a'), selectB = document.querySelector('
 const tacticMessage = document.querySelector('#tactic-message');
 const tacticFile = document.querySelector('#tactic-file');
 const library = [];
-function showTacticMessage(text, error = false) { tacticMessage.hidden = false; tacticMessage.textContent = text; tacticMessage.classList.toggle('error', error); }
-function clearTacticMessage() { tacticMessage.hidden = true; tacticMessage.textContent = ''; tacticMessage.classList.remove('error'); }
+let tacticNotice = null, tacticNoticeError = false;
+function showTacticMessage(text, error = false) { tacticNotice = text; tacticNoticeError = error; tacticMessage.hidden = false; tacticMessage.textContent = text(); tacticMessage.classList.toggle('error', error); }
+function clearTacticMessage() { tacticNotice = null; tacticMessage.hidden = true; tacticMessage.textContent = ''; tacticMessage.classList.remove('error'); }
 function rememberTactic(id, tactic) {
     library.push({ id, tactic });
     for (const select of [selectA, selectB]) {
@@ -86,7 +93,7 @@ function rememberTactic(id, tactic) {
 function selectedTactic(select) {
     const found = library.find(item => item.id === select.value);
     if (!found)
-        throw new Error('Choose a tactic.');
+        throw new Error(t('chooseTactic'));
     return found.tactic;
 }
 function tintedLayer(mask, color) {
@@ -120,8 +127,30 @@ function rebuildPlayerSheets() {
 [playerBase, shirtMask, shortsMask].forEach(img => img.addEventListener('load', () => { if (game)
     rebuildPlayerSheets(); }));
 function reset() { if (!library.length)
-    return; clearTacticMessage(); audio.stopMusic(); winnerBanner.hidden = true; winnerName.textContent = ''; goalAnimationUntil = 0; goalAnimationStarted = 0; kickoffWhistled = false; fulltimeWhistled = false; game = new Game(new Match([selectedTactic(selectA), selectedTactic(selectB)])); rebuildPlayerSheets(); homeName.textContent = game.match.tactics[0].name; awayName.textContent = game.match.tactics[1].name; updateMatchDisplay(); paused = false; gameControl.textContent = 'Pause'; waitUntil = performance.now() + 6000; lastTick = waitUntil; if (audio.enabled)
+    return; clearTacticMessage(); audio.stopMusic(); winnerBanner.hidden = true; winnerName.textContent = ''; goalAnimationUntil = 0; goalAnimationStarted = 0; kickoffWhistled = false; fulltimeWhistled = false; game = new Game(new Match([selectedTactic(selectA), selectedTactic(selectB)])); rebuildPlayerSheets(); homeName.textContent = game.match.tactics[0].name; awayName.textContent = game.match.tactics[1].name; updateMatchDisplay(); paused = false; gameControl.textContent = t('pause'); waitUntil = performance.now() + 6000; lastTick = waitUntil; if (audio.enabled)
     audio.startMusic(); }
+function refreshMatchChrome() {
+    paintAudio();
+    if (!game || game.finished)
+        gameControl.textContent = t('start');
+    else
+        gameControl.textContent = paused ? t('resume') : t('pause');
+    if (game && !winnerBanner.hidden) {
+        const winner = game.match.winner();
+        winnerLabel.textContent = winner === null ? t('draw') : t('winner');
+        winnerName.textContent = winner === null ? t('noWinner') : game.match.tactics[winner].name;
+        winnerTrophy.textContent = winner === null ? '' : '🏆';
+    }
+    const statusEl = document.querySelector('#status');
+    if (!game)
+        statusEl.textContent = t('ready');
+    else
+        statusEl.textContent = game.finished ? t('matchFinished') : paused ? t('paused') : performance.now() < waitUntil ? t('kickoffSoon') : t('inProgress');
+    if (tacticNotice) {
+        tacticMessage.textContent = tacticNotice();
+        tacticMessage.classList.toggle('error', tacticNoticeError);
+    }
+}
 gameControl.addEventListener('click', () => {
     if (game && !game.finished) {
         paused = !paused;
@@ -131,7 +160,7 @@ gameControl.addEventListener('click', () => {
             lastTick = performance.now();
             audio.startMusic();
         }
-        gameControl.textContent = paused ? 'Resume' : 'Pause';
+        gameControl.textContent = paused ? t('resume') : t('pause');
         return;
     }
     reset();
@@ -147,11 +176,11 @@ tacticFile.addEventListener('change', async () => {
         const id = `device:${file.name}:${library.length}`;
         rememberTactic(id, tactic);
         selectA.value = id;
-        showTacticMessage(`Loaded ${tactic.name} as the home team. It will be used the next time Start is pressed.`);
+        showTacticMessage(() => t('loadedHome', { name: tactic.name }));
     }
     catch (error) {
         console.error(error);
-        showTacticMessage(error instanceof SyntaxError ? 'That file is not valid JSON.' : error instanceof Error ? error.message : 'Could not load that tactic.', true);
+        showTacticMessage(() => error instanceof SyntaxError ? t('invalidJson') : error instanceof Error ? error.message : t('couldNotLoadTactic'), true);
     }
 });
 canvas.addEventListener('mousemove', e => { const r = canvas.getBoundingClientRect(); const q = fromCanvas((e.clientX - r.left) * 600 / r.width, (e.clientY - r.top) * 400 / r.height); document.querySelector('#coordinates').textContent = `${Math.trunc(q.x)}, ${Math.trunc(q.y)}`; });
@@ -183,18 +212,19 @@ function drawGoalCelebration(now) {
         ctx.fillStyle = i % 2 === 0 ? 'rgba(255,232,105,0.88)' : 'rgba(255,255,255,0.78)';
         ctx.fill();
     }
+    const goalText = t('goal');
     ctx.font = '900 italic 48px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineJoin = 'round';
     ctx.lineWidth = 10;
     ctx.strokeStyle = '#10251a';
-    ctx.strokeText('GOAL!', 0, 0);
+    ctx.strokeText(goalText, 0, 0);
     ctx.lineWidth = 4;
     ctx.strokeStyle = '#ffffff';
-    ctx.strokeText('GOAL!', 0, 0);
+    ctx.strokeText(goalText, 0, 0);
     ctx.fillStyle = '#fff';
-    ctx.fillText('GOAL!', 0, 0);
+    ctx.fillText(goalText, 0, 0);
     ctx.restore();
 }
 function drawBall(x, y) {
@@ -246,9 +276,9 @@ function drawWelcome(now) {
     const exitEase = exitProgress * exitProgress * exitProgress, offset = -exitEase * (canvas.width + 260), alpha = 1 - exitProgress;
     const easeOutBack = (value) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(value - 1, 3) + c1 * Math.pow(value - 1, 2); };
     const words = [
-        { text: 'WELCOME', start: 120, duration: 520, y: 151, font: '900 25px system-ui', color: '#f4f4e8', size: 25 },
-        { text: 'TO THE', start: 455, duration: 540, y: 193, font: '800 27px system-ui', color: '#ffdf77', size: 27 },
-        { text: 'PITCH', start: 830, duration: 650, y: 239, font: '900 italic 60px system-ui', color: '#fff', size: 60 }
+        { text: t('welcome1'), start: 120, duration: 520, y: 151, font: '900 25px system-ui', color: '#f4f4e8', size: 25 },
+        { text: t('welcome2'), start: 455, duration: 540, y: 193, font: '800 27px system-ui', color: '#ffdf77', size: 27 },
+        { text: t('welcome3'), start: 830, duration: 650, y: 239, font: '900 italic 60px system-ui', color: '#fff', size: 60 }
     ];
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -350,7 +380,7 @@ function drawWelcome(now) {
         ctx.font = '700 9px system-ui';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('VIRTUAL FOOTBALL TOURNAMENT', canvas.width / 2 + offset, 299);
+        ctx.fillText(t('welcomeTag'), canvas.width / 2 + offset, 299);
     }
     ctx.restore();
 }
@@ -385,7 +415,7 @@ function draw() {
     drawBall(Math.trunc(ballScreen.x), Math.trunc(ballScreen.y));
     if (goalAnimationUntil > performance.now())
         drawGoalCelebration(performance.now());
-    document.querySelector('#status').textContent = current.finished ? 'Match finished' : paused ? 'Paused' : performance.now() < waitUntil ? 'Kickoff in a moment…' : 'Match in progress';
+    document.querySelector('#status').textContent = current.finished ? t('matchFinished') : paused ? t('paused') : performance.now() < waitUntil ? t('kickoffSoon') : t('inProgress');
 }
 function frame(now) { const current = game; if (!current) {
     drawWelcome(now);
@@ -440,4 +470,5 @@ async function loadBuiltInTactics() {
     }
     selectB.value = BUILTIN_TACTICS[1];
 }
-loadBuiltInTactics().then(() => { document.querySelector('#status').textContent = 'Ready to start'; requestAnimationFrame(frame); }).catch(error => { console.error(error); showTacticMessage('Could not load the built-in tactics.', true); });
+onLocaleChange(refreshMatchChrome);
+loadBuiltInTactics().then(() => { document.querySelector('#status').textContent = t('ready'); requestAnimationFrame(frame); }).catch(error => { console.error(error); showTacticMessage(() => t('missingBuiltin'), true); });

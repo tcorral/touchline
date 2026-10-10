@@ -3,77 +3,88 @@
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <title>Tactic manual</title>
- <link rel="stylesheet" href="tactics.css">
- <link rel="stylesheet" href="manual.css">
+ <title data-i18n="titleManual">Tactic manual</title>
+ <link rel="stylesheet" href="tactics.css?v=3">
+ <link rel="stylesheet" href="manual.css?v=3">
 </head>
 <body>
  <header class="topbar">
-  <a class="brand" href="index.html"><span class="brand-mark">11</span> TOUCHLINE / LAB</a>
-  <nav class="manual-nav" aria-label="Main navigation"><a href="tactics.html">Tactic builder</a><a href="index.html">Back to match</a></nav>
+  <div class="topbar-start">
+   <label class="locale-picker">
+    <span class="sr-only" data-i18n="language">Language</span>
+    <select id="locale" data-i18n-aria="language" aria-label="Language">
+     <option value="en">English</option>
+     <option value="es">Español</option>
+     <option value="nl">Nederlands</option>
+    </select>
+   </label>
+   <a class="brand" href="index.html"><span class="brand-mark">11</span> TOUCHLINE / LAB</a>
+  </div>
+  <nav class="manual-nav" data-i18n-aria="mainNav" aria-label="Main navigation"><a href="tactics.html" data-i18n="navBuilder">Tactic builder</a><a href="index.html" data-i18n="navMatch">Back to match</a></nav>
  </header>
  <main class="manual-main">
   <header class="page-heading manual-heading">
-   <div><p class="eyebrow">FIELD GUIDE</p><h1>Build a smarter tactic.</h1></div>
-   <p class="heading-note">A practical guide to the shape, instructions, and trade-offs behind every match.</p>
+   <div><p class="eyebrow" data-i18n="eyebrowManual">FIELD GUIDE</p><h1 data-i18n="headingManual">Build a smarter tactic.</h1></div>
+   <p class="heading-note" data-i18n="noteManual">A practical guide to the shape, instructions, and trade-offs behind every match.</p>
   </header>
 
   <section class="manual-section" aria-labelledby="start-heading">
-   <div class="manual-title"><span class="section-index">01</span><h2 id="start-heading">A good first setup</h2></div>
+   <div class="manual-title"><span class="section-index">01</span><h2 id="start-heading" data-i18n="startHeading">A good first setup</h2></div>
    <ol class="quick-start">
-    <li><strong>Choose a shape.</strong> Start with a preset, then adjust the eleven players on the pitch.</li>
-    <li><strong>Give the team a fallback.</strong> Keep a Return to formation step near the top of the list.</li>
-    <li><strong>Assign jobs.</strong> Add Chase the ball and Goalkeeper position; use Mark opponents when you want the first three outfield players to track nearby threats.</li>
-    <li><strong>Add one attacking idea.</strong> Try Pass, Pass or shoot, or Kick into space or shoot. Change one thing at a time.</li>
-    <li><strong>Play both sides.</strong> Save the tactic, select it in a match, and compare the result against different opponents before tuning it again.</li>
+    <li data-i18n-html="quick1"><strong>Choose a shape.</strong> Start with a preset, then adjust the eleven players on the pitch.</li>
+    <li data-i18n-html="quick2"><strong>Give the team a fallback.</strong> Keep a Return to formation step near the top of the list.</li>
+    <li data-i18n-html="quick3"><strong>Assign jobs.</strong> Add Chase the ball and Goalkeeper position; use Mark opponents when you want the first three outfield players to track nearby threats.</li>
+    <li data-i18n-html="quick4"><strong>Add one attacking idea.</strong> Try Pass, Pass or shoot, or Kick into space or shoot. Change one thing at a time.</li>
+    <li data-i18n-html="quick5"><strong>Play both sides.</strong> Save the tactic, select it in a match, and compare the result against different opponents before tuning it again.</li>
    </ol>
   </section>
 
   <section class="manual-section" aria-labelledby="pitch-heading">
-   <div class="manual-title"><span class="section-index">02</span><h2 id="pitch-heading">Shape and player controls</h2></div>
-   <p>The pitch is described from your team's point of view. <strong>X</strong> runs from your own goal at -160 toward the opponent's goal at +160. <strong>Y</strong> moves across the pitch, from -120 to +120. The opponent's team is mirrored automatically, so +X is always forward for the team using the tactic.</p>
+   <div class="manual-title"><span class="section-index">02</span><h2 id="pitch-heading" data-i18n="pitchHeading">Shape and player controls</h2></div>
+   <p data-i18n-html="pitchIntro">The pitch is described from your team's point of view. <strong>X</strong> runs from your own goal at -160 toward the opponent's goal at +160. <strong>Y</strong> moves across the pitch, from -120 to +120. The opponent's team is mirrored automatically, so +X is always forward for the team using the tactic.</p>
    <dl class="manual-definitions">
-    <div><dt>Preset</dt><dd>Places the goalkeeper and ten outfield players in a 4-3-3, 4-4-2, 3-5-2, or 5-3-2. Choosing a preset again resets their positions and strengths.</dd></div>
-    <div><dt>Drag a shirt</dt><dd>Move a player on the pitch. Click a shirt or player button first to select that player; the highlighted shirt is selected.</dd></div>
-    <div><dt>X and Y position</dt><dd>Set the selected player's exact starting and return-to-formation location. Keep enough space between teammates to give them distinct lanes.</dd></div>
-    <div><dt>Strength (1-10)</dt><dd>Higher strength gives a player more kick power, but lowers their movement speed. A value of 10 is powerful but slow; 1 is quicker but kicks weakly. Balance the team rather than maxing every player.</dd></div>
-    <div><dt>Team identity</dt><dd>Name the tactic and choose shirt, shorts, and number colors. These make the team easier to identify in the match.</dd></div>
+    <div><dt data-i18n="defPreset">Preset</dt><dd data-i18n="defPresetBody">Places the goalkeeper and ten outfield players in a 4-3-3, 4-4-2, 3-5-2, or 5-3-2. Choosing a preset again resets their positions and strengths.</dd></div>
+    <div><dt data-i18n="defDrag">Drag a shirt</dt><dd data-i18n="defDragBody">Move a player on the pitch. Click a shirt or player button first to select that player; the highlighted shirt is selected.</dd></div>
+    <div><dt data-i18n="defXY">X and Y position</dt><dd data-i18n="defXYBody">Set the selected player's exact starting and return-to-formation location. Keep enough space between teammates to give them distinct lanes.</dd></div>
+    <div><dt data-i18n="defStrength">Strength (1-10)</dt><dd data-i18n="defStrengthBody">Higher strength gives a player more kick power, but lowers their movement speed. A value of 10 is powerful but slow; 1 is quicker but kicks weakly. Balance the team rather than maxing every player.</dd></div>
+    <div><dt data-i18n="defIdentity">Team identity</dt><dd data-i18n="defIdentityBody">Name the tactic and choose shirt, shorts, and number colors. These make the team easier to identify in the match.</dd></div>
    </dl>
   </section>
 
   <section class="manual-section" aria-labelledby="steps-heading">
-   <div class="manual-title"><span class="section-index">03</span><h2 id="steps-heading">Play instructions, step by step</h2></div>
-    <p>Instructions are evaluated from top to bottom on every match turn. They are not one-time events. Use the up and down arrows to change order, Add step to append an instruction, and the remove button (×) to delete one. If two steps send the same player to different places, the later movement instruction wins for that turn. Put your basic shape first, then the jobs that should override it.</p>
+   <div class="manual-title"><span class="section-index">03</span><h2 id="steps-heading" data-i18n="stepsGuideHeading">Play instructions, step by step</h2></div>
+   <p data-i18n="stepsIntro">Instructions are evaluated from top to bottom on every match turn. They are not one-time events. Use the up and down arrows to change order, Add step to append an instruction, and the remove button (×) to delete one. If two steps send the same player to different places, the later movement instruction wins for that turn. Put your basic shape first, then the jobs that should override it.</p>
    <div class="step-guide">
-    <article><h3>Return to formation</h3><p>Sends all eleven players toward their positions on the pitch. Use it as the team's default shape. A later movement step can replace a player's formation target for that turn; Return to formation sets it again on the next turn.</p></article>
-    <article><h3>Chase the ball</h3><p>Sends only the teammate closest to the ball toward it. It does not move the whole team. Place Goalkeeper position after this step so the goalkeeper's position is not replaced when they happen to be the closest player.</p></article>
-    <article><h3>Goalkeeper position</h3><p>Keeps the goalkeeper on their formation X coordinate and shifts them toward half the ball's Y position, limited to a narrow central band. This is a simple central positioning rule, not a save or dive command.</p></article>
-    <article><h3>Mark opponents</h3><p>Repositions players 2, 3, and 4 to track the opponents nearest their formation positions. It activates when your team is not closer to the ball, or whenever the ball is in your half. Put it after Return to formation so the marking movement is not immediately overwritten.</p></article>
-    <article><h3>Shoot</h3><p>Choose one shooter or All players. Each selected player attempts a shot toward the opponent's goal when close enough to the ball. <strong>Deviation</strong> shifts the aim across the pitch: 0 aims straight; positive and negative values aim to opposite sides. The ball still has built-in variation, so a shot is not guaranteed to be exact.</p></article>
-    <article><h3>Pass</h3><p>Choose <strong>From</strong> and <strong>To</strong> by player number (1 is the goalkeeper). The selected passer tries to kick toward the selected teammate. The pass only takes effect when the passer can reach the ball.</p></article>
-    <article><h3>Pass or shoot</h3><p>For each player, compare their X position with <strong>Pass below X</strong>. Below that line, they try to pass to the nearest teammate further forward; at or beyond it, they try to shoot. Raise the line to let players shoot sooner, or lower it to encourage more forward progression. <strong>Shot deviation</strong> works like it does in Shoot.</p></article>
-    <article><h3>Kick into space or shoot</h3><p>The tactic samples possible destinations and chooses one that favors forward space and avoids nearby players. Players beyond <strong>Shoot above X</strong> try to shoot; others kick toward the chosen space. More <strong>Search samples</strong> means more candidate destinations are checked, at extra computation cost. The search is approximate and can vary from turn to turn. <strong>Deviation</strong> sets the shot aim.</p></article>
+    <article><h3 data-i18n="opFormation">Return to formation</h3><p data-i18n="guideFormationBody">Sends all eleven players toward their positions on the pitch. Use it as the team's default shape. A later movement step can replace a player's formation target for that turn; Return to formation sets it again on the next turn.</p></article>
+    <article><h3 data-i18n="opChase">Chase the ball</h3><p data-i18n="guideChaseBody">Sends only the teammate closest to the ball toward it. It does not move the whole team. Place Goalkeeper position after this step so the goalkeeper's position is not replaced when they happen to be the closest player.</p></article>
+    <article><h3 data-i18n="opKeeper">Goalkeeper position</h3><p data-i18n="guideKeeperBody">Keeps the goalkeeper on their formation X coordinate and shifts them toward half the ball's Y position, limited to a narrow central band. This is a simple central positioning rule, not a save or dive command.</p></article>
+    <article><h3 data-i18n="opDefend">Mark opponents</h3><p data-i18n="guideMarkBody">Repositions players 2, 3, and 4 to track the opponents nearest their formation positions. It activates when your team is not closer to the ball, or whenever the ball is in your half. Put it after Return to formation so the marking movement is not immediately overwritten.</p></article>
+    <article><h3 data-i18n="opShoot">Shoot</h3><p data-i18n-html="guideShootBody">Choose one shooter or All players. Each selected player attempts a shot toward the opponent's goal when close enough to the ball. <strong>Deviation</strong> shifts the aim across the pitch: 0 aims straight; positive and negative values aim to opposite sides. The ball still has built-in variation, so a shot is not guaranteed to be exact.</p></article>
+    <article><h3 data-i18n="opPass">Pass</h3><p data-i18n-html="guidePassBody">Choose <strong>From</strong> and <strong>To</strong> by player number (1 is the goalkeeper). The selected passer tries to kick toward the selected teammate. The pass only takes effect when the passer can reach the ball.</p></article>
+    <article><h3 data-i18n="opPassOrShoot">Pass or shoot</h3><p data-i18n-html="guidePassShootBody">For each player, compare their X position with <strong>Pass below X</strong>. Below that line, they try to pass to the nearest teammate further forward; at or beyond it, they try to shoot. Raise the line to let players shoot sooner, or lower it to encourage more forward progression. <strong>Shot deviation</strong> works like it does in Shoot.</p></article>
+    <article><h3 data-i18n="opKickSpace">Kick into space or shoot</h3><p data-i18n-html="guideSpaceBody">The tactic samples possible destinations and chooses one that favors forward space and avoids nearby players. Players beyond <strong>Shoot above X</strong> try to shoot; others kick toward the chosen space. More <strong>Search samples</strong> means more candidate destinations are checked, at extra computation cost. The search is approximate and can vary from turn to turn. <strong>Deviation</strong> sets the shot aim.</p></article>
    </div>
-   <p class="manual-callout"><strong>Player numbers:</strong> the editor shows players 1-11, with 1 marked GK. Number fields in downloaded tactic data use zero-based indexes, so player 1 appears as index 0 in JSON.</p>
+   <p class="manual-callout" data-i18n-html="playerNumbers"><strong>Player numbers:</strong> the editor shows players 1-11, with 1 marked GK. Number fields in downloaded tactic data use zero-based indexes, so player 1 appears as index 0 in JSON.</p>
   </section>
 
   <section class="manual-section" aria-labelledby="order-heading">
-   <div class="manual-title"><span class="section-index">04</span><h2 id="order-heading">Ordering and tactics that hold up</h2></div>
+   <div class="manual-title"><span class="section-index">04</span><h2 id="order-heading" data-i18n="orderHeading">Ordering and tactics that hold up</h2></div>
    <ul class="advice-list">
-    <li><strong>Think in layers.</strong> Put Return to formation first, then add Chase the ball, Goalkeeper position, or Mark opponents in the order you want them to take priority. Movement targets are assigned in order, so the last instruction affecting that player wins for that turn.</li>
-    <li><strong>Watch for overlap.</strong> Chase can select any teammate, including the goalkeeper. A later goalkeeper or marking instruction can replace that player's movement target.</li>
-    <li><strong>Use thresholds deliberately.</strong> The X threshold fields are pitch coordinates, not percentages. Move them a little at a time and observe when the team switches behavior.</li>
-    <li><strong>Keep the shape connected.</strong> Spread players across the width, but avoid leaving very large gaps between the ball carrier and useful passing options.</li>
-    <li><strong>Test one change at a time.</strong> Compare the same tactic against itself, then against several styles. A single win or loss can be noisy; look for repeated patterns such as a vacant flank or shots taken too early.</li>
-    <li><strong>Remember the trade-offs.</strong> More strength improves kicks but slows movement. More search samples inspect more options but use more computation. No preset or step guarantees a win.</li>
+    <li data-i18n-html="advice1"><strong>Think in layers.</strong> Put Return to formation first, then add Chase the ball, Goalkeeper position, or Mark opponents in the order you want them to take priority. Movement targets are assigned in order, so the last instruction affecting that player wins for that turn.</li>
+    <li data-i18n-html="advice2"><strong>Watch for overlap.</strong> Chase can select any teammate, including the goalkeeper. A later goalkeeper or marking instruction can replace that player's movement target.</li>
+    <li data-i18n-html="advice3"><strong>Use thresholds deliberately.</strong> The X threshold fields are pitch coordinates, not percentages. Move them a little at a time and observe when the team switches behavior.</li>
+    <li data-i18n-html="advice4"><strong>Keep the shape connected.</strong> Spread players across the width, but avoid leaving very large gaps between the ball carrier and useful passing options.</li>
+    <li data-i18n-html="advice5"><strong>Test one change at a time.</strong> Compare the same tactic against itself, then against several styles. A single win or loss can be noisy; look for repeated patterns such as a vacant flank or shots taken too early.</li>
+    <li data-i18n-html="advice6"><strong>Remember the trade-offs.</strong> More strength improves kicks but slows movement. More search samples inspect more options but use more computation. No preset or step guarantees a win.</li>
    </ul>
   </section>
 
   <section class="manual-section manual-save" aria-labelledby="save-heading">
-   <div class="manual-title"><span class="section-index">05</span><h2 id="save-heading">Save, share, and play</h2></div>
-   <p><strong>Save to this browser</strong> stores the tactic locally and makes it available in both team selectors on this browser. <strong>Download JSON</strong> creates a file you can keep or share. On the match screen, choose <strong>Load tactic</strong> to load a JSON file; it will be added to the team selectors.</p>
-   <a class="manual-button" href="tactics.html">Open the tactic builder</a>
+   <div class="manual-title"><span class="section-index">05</span><h2 id="save-heading" data-i18n="saveShareHeading">Save, share, and play</h2></div>
+   <p data-i18n-html="saveShareBody"><strong>Save to this browser</strong> stores the tactic locally and makes it available in both team selectors on this browser. <strong>Download JSON</strong> creates a file you can keep or share. On the match screen, choose <strong>Load tactic</strong> to load a JSON file; it will be added to the team selectors.</p>
+   <a class="manual-button" href="tactics.html" data-i18n="openBuilder">Open the tactic builder</a>
   </section>
  </main>
+ <script type="module" src="dist/locale.js?v=3"></script>
 </body>
 </html>

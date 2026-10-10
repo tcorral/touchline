@@ -1,4 +1,5 @@
 import {Command,Formation,RandomSource,Situation,Tactic,clamp,distance} from './engine.js';
+import {t} from './i18n.js';
 
 export const BUILTIN_TACTICS=['tactics/demo01.json','tactics/demo02.json','tactics/pepe.json','tactics/juan.json','tactics/ana.json'];
 
@@ -78,20 +79,20 @@ function applyStep(step:TacticStep,formation:Formation,s:Situation,random:Random
 }
 
 export function parseTacticDefinition(value:unknown):TacticDefinition {
-  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('A tactic file must be a JSON object.');
+  if(!value||typeof value!=='object'||Array.isArray(value))throw new Error(t('errObject'));
   const raw=value as Record<string,unknown>;
-  if(typeof raw.name!=='string'||!raw.name.trim())throw new Error('The tactic needs a name.');
+  if(typeof raw.name!=='string'||!raw.name.trim())throw new Error(t('errName'));
   if(!Array.isArray(raw.colors)||raw.colors.length!==3||raw.colors.some(color=>typeof color!=='string'||!color.trim())){
-    throw new Error('Colors must be three strings: shirt, shorts, and number.');
+    throw new Error(t('errColors'));
   }
-  if(!Array.isArray(raw.formation)||raw.formation.length!==11)throw new Error('The formation must list 11 players.');
+  if(!Array.isArray(raw.formation)||raw.formation.length!==11)throw new Error(t('errFormation'));
   const formation:Formation=raw.formation.map((row,index)=>{
     if(!Array.isArray(row)||row.length!==3||row.some(n=>typeof n!=='number'||!Number.isFinite(n))){
-      throw new Error(`Player ${index+1} must be [x, y, strength].`);
+      throw new Error(t('errPlayer',{n:index+1}));
     }
     return [row[0],row[1],row[2]];
   });
-  if(!Array.isArray(raw.steps)||raw.steps.length===0)throw new Error('The tactic needs at least one step.');
+  if(!Array.isArray(raw.steps)||raw.steps.length===0)throw new Error(t('errSteps'));
   return {
     name:raw.name.trim(),
     colors:[raw.colors[0] as string,raw.colors[1] as string,raw.colors[2] as string],
@@ -102,10 +103,10 @@ export function parseTacticDefinition(value:unknown):TacticDefinition {
 
 function parseStep(value:unknown,index:number):TacticStep {
   if(!value||typeof value!=='object'||Array.isArray(value)||typeof (value as {op?:unknown}).op!=='string'){
-    throw new Error(`Step ${index+1} needs an op.`);
+    throw new Error(t('errStepOp',{n:index+1}));
   }
   const step=value as Record<string,unknown>;
-  const label=`Step ${index+1}`;
+  const stepLabel=t('stepN',{n:index+1});
   switch(step.op){
     case 'formation':
     case 'chase':
@@ -113,29 +114,29 @@ function parseStep(value:unknown,index:number):TacticStep {
     case 'defend':
       return {op:step.op};
     case 'shoot':
-      return {op:'shoot',player:step.player==='all'?'all':playerIndex(step.player,`${label} player`),deviation:finiteNumber(step.deviation,`${label} deviation`)};
+      return {op:'shoot',player:step.player==='all'?'all':playerIndex(step.player,t('labelPlayer',{step:stepLabel})),deviation:finiteNumber(step.deviation,t('labelDeviation',{step:stepLabel}))};
     case 'pass':
-      return {op:'pass',from:playerIndex(step.from,`${label} passer`),to:playerIndex(step.to,`${label} receiver`)};
+      return {op:'pass',from:playerIndex(step.from,t('labelPasser',{step:stepLabel})),to:playerIndex(step.to,t('labelReceiver',{step:stepLabel}))};
     case 'pass-or-shoot':
-      return {op:'pass-or-shoot',whenXBelow:finiteNumber(step.whenXBelow,`${label} line`),deviation:finiteNumber(step.deviation,`${label} deviation`)};
+      return {op:'pass-or-shoot',whenXBelow:finiteNumber(step.whenXBelow,t('labelLine',{step:stepLabel})),deviation:finiteNumber(step.deviation,t('labelDeviation',{step:stepLabel}))};
     case 'kick-space-or-shoot':
-      return {op:'kick-space-or-shoot',samples:sampleCount(step.samples),whenXAbove:finiteNumber(step.whenXAbove,`${label} line`),deviation:finiteNumber(step.deviation,`${label} deviation`)};
+      return {op:'kick-space-or-shoot',samples:sampleCount(step.samples),whenXAbove:finiteNumber(step.whenXAbove,t('labelLine',{step:stepLabel})),deviation:finiteNumber(step.deviation,t('labelDeviation',{step:stepLabel}))};
     default:
-      throw new Error(`Unknown tactic step "${step.op}".`);
+      throw new Error(t('errUnknown',{op:String(step.op)}));
   }
 }
 
 function playerIndex(value:unknown,label:string):number {
-  if(typeof value!=='number'||!Number.isInteger(value)||value<0||value>10)throw new Error(`${label} must be a player index from 0 to 10.`);
+  if(typeof value!=='number'||!Number.isInteger(value)||value<0||value>10)throw new Error(t('errPlayerIndex',{label}));
   return value;
 }
 
 function finiteNumber(value:unknown,label:string):number {
-  if(typeof value!=='number'||!Number.isFinite(value))throw new Error(`${label} must be a number.`);
+  if(typeof value!=='number'||!Number.isFinite(value))throw new Error(t('errNumber',{label}));
   return value;
 }
 
 function sampleCount(value:unknown):number {
-  if(typeof value!=='number'||!Number.isInteger(value)||value<1||value>500)throw new Error('Space search samples must be a whole number from 1 to 500.');
+  if(typeof value!=='number'||!Number.isInteger(value)||value<1||value>500)throw new Error(t('errSamples'));
   return value;
 }

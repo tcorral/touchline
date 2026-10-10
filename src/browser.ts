@@ -1,12 +1,15 @@
 import {Game,Match,Tactic} from './engine.js';
 import {GameAudio} from './audio.js';
 import {BUILTIN_TACTICS,loadTactic} from './tactics.js';
+import {onLocaleChange,t} from './i18n.js';
 const audio=new GameAudio();
 const audioButton=document.querySelector<HTMLButtonElement>('#audio-toggle')!;
+let audioHint:'on'|'off'|'tap'='on';
+function paintAudio(){audioButton.textContent=audioHint==='on'?t('soundOn'):audioHint==='tap'?t('soundTap'):t('soundOff');}
 document.querySelector<HTMLButtonElement>('#create-tactic')!.addEventListener('click',()=>{window.location.href='tactics.html';});
 const gameControl=document.querySelector<HTMLButtonElement>('#game-control')!;
-async function enableAudio(){try{await audio.enable();audioButton.textContent='🔊 Sound on';if(game&&!paused&&!game.finished)audio.startMusic();}catch(error){console.error(error);audioButton.textContent='Tap to enable sound';}}
-audioButton.addEventListener('click',()=>{if(audio.enabled){audio.disable();audioButton.textContent='🔇 Enable sound';}else void enableAudio();});
+async function enableAudio(){try{await audio.enable();audioHint='on';paintAudio();if(game&&!paused&&!game.finished)audio.startMusic();}catch(error){console.error(error);audioHint='tap';paintAudio();}}
+audioButton.addEventListener('click',()=>{if(audio.enabled){audio.disable();audioHint='off';paintAudio();}else void enableAudio();});
 void enableAudio();
 let audioGestureHandled=false;
 function unlockAudio(event:Event){
@@ -31,8 +34,8 @@ const winnerBanner=document.querySelector<HTMLElement>('#winner-banner')!,winner
 function updateMatchDisplay(){
  if(!game)return;
  homeScore.textContent=String(game.match.score[0]);awayScore.textContent=String(game.match.score[1]);timer.textContent=game.clock;
- if(game.finished&&winnerBanner.hidden){const winner=game.match.winner();winnerLabel.textContent=winner===null?'MATCH DRAW':'MATCH WINNER';winnerName.textContent=winner===null?'No winner':game.match.tactics[winner].name;winnerTrophy.textContent=winner===null?'':'🏆';winnerBanner.hidden=false;}
- if(game.finished)gameControl.textContent='Start';
+ if(game.finished&&winnerBanner.hidden){const winner=game.match.winner();winnerLabel.textContent=winner===null?t('draw'):t('winner');winnerName.textContent=winner===null?t('noWinner'):game.match.tactics[winner].name;winnerTrophy.textContent=winner===null?'':'🏆';winnerBanner.hidden=false;}
+ if(game.finished)gameControl.textContent=t('start');
 }
 // Simulation coordinates span x=-160..160 and y=-120..120.
 // Map those limits to the actual pitch lines in the 600x400 background.
@@ -43,15 +46,16 @@ const selectA=document.querySelector<HTMLSelectElement>('#a')!,selectB=document.
 const tacticMessage=document.querySelector<HTMLElement>('#tactic-message')!;
 const tacticFile=document.querySelector<HTMLInputElement>('#tactic-file')!;
 const library: {id:string;tactic:Tactic}[]=[];
-function showTacticMessage(text:string,error=false){tacticMessage.hidden=false;tacticMessage.textContent=text;tacticMessage.classList.toggle('error',error);}
-function clearTacticMessage(){tacticMessage.hidden=true;tacticMessage.textContent='';tacticMessage.classList.remove('error');}
+let tacticNotice:(()=>string)|null=null,tacticNoticeError=false;
+function showTacticMessage(text:()=>string,error=false){tacticNotice=text;tacticNoticeError=error;tacticMessage.hidden=false;tacticMessage.textContent=text();tacticMessage.classList.toggle('error',error);}
+function clearTacticMessage(){tacticNotice=null;tacticMessage.hidden=true;tacticMessage.textContent='';tacticMessage.classList.remove('error');}
 function rememberTactic(id:string,tactic:Tactic){
  library.push({id,tactic});
  for(const select of [selectA,selectB]){const option=document.createElement('option');option.value=id;option.textContent=tactic.name;select.append(option);}
 }
 function selectedTactic(select:HTMLSelectElement):Tactic{
  const found=library.find(item=>item.id===select.value);
- if(!found)throw new Error('Choose a tactic.');
+ if(!found)throw new Error(t('chooseTactic'));
  return found.tactic;
 }
 function tintedLayer(mask:HTMLImageElement,color:string):HTMLCanvasElement {
@@ -70,12 +74,22 @@ function rebuildPlayerSheets(){
  });
 }
 [playerBase,shirtMask,shortsMask].forEach(img=>img.addEventListener('load',()=>{if(game)rebuildPlayerSheets();}));
-function reset(){if(!library.length)return;clearTacticMessage();audio.stopMusic();winnerBanner.hidden=true;winnerName.textContent='';goalAnimationUntil=0;goalAnimationStarted=0;kickoffWhistled=false;fulltimeWhistled=false;game=new Game(new Match([selectedTactic(selectA),selectedTactic(selectB)]));rebuildPlayerSheets();homeName.textContent=game.match.tactics[0].name;awayName.textContent=game.match.tactics[1].name;updateMatchDisplay();paused=false;gameControl.textContent='Pause';waitUntil=performance.now()+6000;lastTick=waitUntil;if(audio.enabled)audio.startMusic();}
+function reset(){if(!library.length)return;clearTacticMessage();audio.stopMusic();winnerBanner.hidden=true;winnerName.textContent='';goalAnimationUntil=0;goalAnimationStarted=0;kickoffWhistled=false;fulltimeWhistled=false;game=new Game(new Match([selectedTactic(selectA),selectedTactic(selectB)]));rebuildPlayerSheets();homeName.textContent=game.match.tactics[0].name;awayName.textContent=game.match.tactics[1].name;updateMatchDisplay();paused=false;gameControl.textContent=t('pause');waitUntil=performance.now()+6000;lastTick=waitUntil;if(audio.enabled)audio.startMusic();}
+function refreshMatchChrome(){
+ paintAudio();
+ if(!game||game.finished)gameControl.textContent=t('start');
+ else gameControl.textContent=paused?t('resume'):t('pause');
+ if(game&&!winnerBanner.hidden){const winner=game.match.winner();winnerLabel.textContent=winner===null?t('draw'):t('winner');winnerName.textContent=winner===null?t('noWinner'):game.match.tactics[winner].name;winnerTrophy.textContent=winner===null?'':'🏆';}
+ const statusEl=document.querySelector<HTMLElement>('#status')!;
+ if(!game)statusEl.textContent=t('ready');
+ else statusEl.textContent=game.finished?t('matchFinished'):paused?t('paused'):performance.now()<waitUntil?t('kickoffSoon'):t('inProgress');
+ if(tacticNotice){tacticMessage.textContent=tacticNotice();tacticMessage.classList.toggle('error',tacticNoticeError);}
+}
 gameControl.addEventListener('click',()=>{
  if(game&&!game.finished){
   paused=!paused;
   if(paused)audio.stopMusic();else{lastTick=performance.now();audio.startMusic();}
-  gameControl.textContent=paused?'Resume':'Pause';
+  gameControl.textContent=paused?t('resume'):t('pause');
   return;
  }
  reset();
@@ -90,10 +104,10 @@ tacticFile.addEventListener('change',async()=>{
   const id=`device:${file.name}:${library.length}`;
   rememberTactic(id,tactic);
   selectA.value=id;
-    showTacticMessage(`Loaded ${tactic.name} as the home team. It will be used the next time Start is pressed.`);
+    showTacticMessage(()=>t('loadedHome',{name:tactic.name}));
  }catch(error){
   console.error(error);
-  showTacticMessage(error instanceof SyntaxError?'That file is not valid JSON.':error instanceof Error?error.message:'Could not load that tactic.',true);
+  showTacticMessage(()=>error instanceof SyntaxError?t('invalidJson'):error instanceof Error?error.message:t('couldNotLoadTactic'),true);
  }
 });
 canvas.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();const q=fromCanvas((e.clientX-r.left)*600/r.width,(e.clientY-r.top)*400/r.height);document.querySelector('#coordinates')!.textContent=`${Math.trunc(q.x)}, ${Math.trunc(q.y)}`;});
@@ -104,7 +118,7 @@ function drawGoalCelebration(now:number){
  // Bright radial burst behind the headline.
  ctx.fillStyle='rgba(255,224,76,0.22)';ctx.beginPath();ctx.arc(0,0,112,0,Math.PI*2);ctx.fill();
  for(let i=0;i<18;i++){const a=i*Math.PI/9;const r1=68,r2=i%2===0?126:108;ctx.beginPath();ctx.moveTo(Math.cos(a)*r1,Math.sin(a)*r1);ctx.lineTo(Math.cos(a+0.045)*r2,Math.sin(a+0.045)*r2);ctx.lineTo(Math.cos(a-0.045)*r2,Math.sin(a-0.045)*r2);ctx.closePath();ctx.fillStyle=i%2===0?'rgba(255,232,105,0.88)':'rgba(255,255,255,0.78)';ctx.fill();}
- ctx.font='900 italic 48px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.lineWidth=10;ctx.strokeStyle='#10251a';ctx.strokeText('GOAL!',0,0);ctx.lineWidth=4;ctx.strokeStyle='#ffffff';ctx.strokeText('GOAL!',0,0);ctx.fillStyle='#fff';ctx.fillText('GOAL!',0,0);
+ const goalText=t('goal');ctx.font='900 italic 48px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';ctx.lineWidth=10;ctx.strokeStyle='#10251a';ctx.strokeText(goalText,0,0);ctx.lineWidth=4;ctx.strokeStyle='#ffffff';ctx.strokeText(goalText,0,0);ctx.fillStyle='#fff';ctx.fillText(goalText,0,0);
  ctx.restore();
 }
 function drawBall(x:number,y:number){
@@ -124,9 +138,9 @@ function drawWelcome(now:number){
  const exitEase=exitProgress*exitProgress*exitProgress,offset=-exitEase*(canvas.width+260),alpha=1-exitProgress;
  const easeOutBack=(value:number)=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(value-1,3)+c1*Math.pow(value-1,2);};
  const words=[
-  {text:'WELCOME',start:120,duration:520,y:151,font:'900 25px system-ui',color:'#f4f4e8',size:25},
-  {text:'TO THE',start:455,duration:540,y:193,font:'800 27px system-ui',color:'#ffdf77',size:27},
-  {text:'PITCH',start:830,duration:650,y:239,font:'900 italic 60px system-ui',color:'#fff',size:60}
+  {text:t('welcome1'),start:120,duration:520,y:151,font:'900 25px system-ui',color:'#f4f4e8',size:25},
+  {text:t('welcome2'),start:455,duration:540,y:193,font:'800 27px system-ui',color:'#ffdf77',size:27},
+  {text:t('welcome3'),start:830,duration:650,y:239,font:'900 italic 60px system-ui',color:'#fff',size:60}
  ];
  ctx.save();ctx.globalAlpha=alpha;
  if(!reducedMotion&&cycle>=120&&cycle<exitStart){
@@ -152,7 +166,7 @@ function drawWelcome(now:number){
  });
  if(cycle>=120&&cycle<exitStart){
   const ruleProgress=reducedMotion?1:Math.max(0,Math.min(1,(cycle-950)/500));ctx.globalAlpha=alpha*ruleProgress;ctx.fillStyle='#ffdf77';ctx.fillRect(canvas.width/2-112+offset,278,224*ruleProgress,3);
-  ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='700 9px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('VIRTUAL FOOTBALL TOURNAMENT',canvas.width/2+offset,299);
+  ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='700 9px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t('welcomeTag'),canvas.width/2+offset,299);
  }
  ctx.restore();
 }
@@ -168,7 +182,7 @@ function draw(){if(!game)return;const current=game;ctx.fillStyle='#196c36';ctx.f
   ctx.fillStyle=colors[2];ctx.font='bold 8px Arial';ctx.textAlign='center';ctx.fillText(String(p.number),x,y+12);
  }));
  const b=current.match.ball,ballScreen=toCanvas(b.x,b.y);drawBall(Math.trunc(ballScreen.x),Math.trunc(ballScreen.y));if(goalAnimationUntil>performance.now())drawGoalCelebration(performance.now());
- document.querySelector('#status')!.textContent=current.finished?'Match finished':paused?'Paused':performance.now()<waitUntil?'Kickoff in a moment…':'Match in progress';
+ document.querySelector('#status')!.textContent=current.finished?t('matchFinished'):paused?t('paused'):performance.now()<waitUntil?t('kickoffSoon'):t('inProgress');
 }
 function frame(now:number){const current=game;if(!current){drawWelcome(now);requestAnimationFrame(frame);return;}if(!paused&&now>=waitUntil){if(!kickoffWhistled){kickoffWhistled=true;audio.effect('whistle_start');}const speed=Number(document.querySelector<HTMLSelectElement>('#speed')!.value);let count=0;while(now-lastTick>=100/speed&&count++<100){const previousScore=current.match.score[0]+current.match.score[1],previousKicks=current.match.ball.kicks;current.tick();if(current.match.ball.kicks>previousKicks)audio.effect('kick');const currentScore=current.match.score[0]+current.match.score[1];if(currentScore>previousScore){audio.effect('goal');if(speed===1||speed===5){goalAnimationStarted=now;goalAnimationUntil=now+1500;}}if(current.finished&&!fulltimeWhistled){fulltimeWhistled=true;audio.stopMusic();audio.effect('whistle_end');}lastTick+=100/speed;}}updateMatchDisplay();draw();requestAnimationFrame(frame);}
 async function loadBuiltInTactics(){
@@ -185,4 +199,5 @@ async function loadBuiltInTactics(){
  }catch(error){console.warn('Could not load saved tactics.',error);}
  selectB.value=BUILTIN_TACTICS[1];
 }
-loadBuiltInTactics().then(()=>{document.querySelector<HTMLElement>('#status')!.textContent='Ready to start';requestAnimationFrame(frame);}).catch(error=>{console.error(error);showTacticMessage('Could not load the built-in tactics.',true);});
+onLocaleChange(refreshMatchChrome);
+loadBuiltInTactics().then(()=>{document.querySelector<HTMLElement>('#status')!.textContent=t('ready');requestAnimationFrame(frame);}).catch(error=>{console.error(error);showTacticMessage(()=>t('missingBuiltin'),true);});

@@ -3,78 +3,88 @@
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
- <title>Tactic workshop</title>
- <link rel="stylesheet" href="tactics.css">
+ <title data-i18n="titleWorkshop">Tactic workshop</title>
+ <link rel="stylesheet" href="tactics.css?v=3">
 </head>
 <body>
  <header class="topbar">
-  <a class="brand" href="index.html"><span class="brand-mark">11</span> TOUCHLINE / LAB</a>
-    <nav class="creator-nav" aria-label="Main navigation"><a href="manual.html">Tactic manual</a><a class="return-link" href="index.html">Back to match <span aria-hidden="true">↗</span></a></nav>
+  <div class="topbar-start">
+   <label class="locale-picker">
+    <span class="sr-only" data-i18n="language">Language</span>
+    <select id="locale" data-i18n-aria="language" aria-label="Language">
+     <option value="en">English</option>
+     <option value="es">Español</option>
+     <option value="nl">Nederlands</option>
+    </select>
+   </label>
+   <a class="brand" href="index.html"><span class="brand-mark">11</span> TOUCHLINE / LAB</a>
+  </div>
+  <nav class="creator-nav" data-i18n-aria="mainNav" aria-label="Main navigation"><a href="manual.html" data-i18n="navManual">Tactic manual</a><a class="return-link" href="index.html"><span data-i18n="navMatch">Back to match</span><span class="return-arrow" aria-hidden="true">↗</span></a></nav>
  </header>
  <main>
   <header class="page-heading">
-   <div><p class="eyebrow">TACTIC BUILDER</p><h1>Draw up your eleven.</h1></div>
-   <p class="heading-note">Set the shape. Pick the colors. Tell the team what to do.</p>
+   <div><p class="eyebrow" data-i18n="eyebrowBuilder">TACTIC BUILDER</p><h1 data-i18n="headingBuilder">Draw up your eleven.</h1></div>
+   <p class="heading-note" data-i18n="noteBuilder">Set the shape. Pick the colors. Tell the team what to do.</p>
   </header>
 
   <section class="identity-section" aria-labelledby="identity-heading">
-   <div class="section-heading"><div><span class="section-index">01</span><h2 id="identity-heading">Team identity</h2></div></div>
+   <div class="section-heading"><div><span class="section-index">01</span><h2 id="identity-heading" data-i18n="teamIdentity">Team identity</h2></div></div>
    <div class="identity-grid">
-    <label class="name-field">Team name<input id="tactic-name" maxlength="48" value="My tactic" required></label>
-    <fieldset class="colors-field"><legend>Team colors</legend>
-     <label><input id="shirt-color" type="color" value="#e8d84a"><span>Shirt</span></label>
-     <label><input id="shorts-color" type="color" value="#237d58"><span>Shorts</span></label>
-     <label><input id="number-color" type="color" value="#ffffff"><span>Numbers</span></label>
+    <label class="name-field"><span data-i18n="teamName">Team name</span><input id="tactic-name" maxlength="48" value="My tactic" required></label>
+    <fieldset class="colors-field"><legend data-i18n="teamColors">Team colors</legend>
+     <label><input id="shirt-color" type="color" value="#e8d84a"><span data-i18n="shirt">Shirt</span></label>
+     <label><input id="shorts-color" type="color" value="#237d58"><span data-i18n="shorts">Shorts</span></label>
+     <label><input id="number-color" type="color" value="#ffffff"><span data-i18n="numbers">Numbers</span></label>
     </fieldset>
    </div>
    <div class="template-loader">
-    <label for="tactic-template">Start from a tactic</label>
-    <select id="tactic-template"><option value="" selected disabled>Choose a built-in tactic</option></select>
-    <button id="load-template" class="secondary-button" type="button" disabled>Load as a copy</button>
+    <label for="tactic-template"><span data-i18n="startFrom">Start from a tactic</span></label>
+    <select id="tactic-template"><option value="" selected disabled data-i18n="chooseBuiltin">Choose a built-in tactic</option></select>
+    <button id="load-template" class="secondary-button" type="button" disabled data-i18n="loadCopy">Load as a copy</button>
    </div>
   </section>
 
   <div class="builder-grid">
    <section class="formation-section" aria-labelledby="formation-heading">
     <div class="section-heading">
-     <div><span class="section-index">02</span><h2 id="formation-heading">Starting shape</h2></div>
-    <label class="preset-field">Preset<select id="formation-preset"><option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option><option value="3-5-2">3-5-2</option><option value="5-3-2">5-3-2</option><option value="custom">Custom</option></select></label>
+     <div><span class="section-index">02</span><h2 id="formation-heading" data-i18n="startingShape">Starting shape</h2></div>
+    <label class="preset-field"><span data-i18n="preset">Preset</span><select id="formation-preset"><option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option><option value="3-5-2">3-5-2</option><option value="5-3-2">5-3-2</option><option value="custom" data-i18n="custom">Custom</option></select></label>
     </div>
-    <p class="section-note">Drag a shirt to place it, or select a player to edit exact values.</p>
-    <canvas id="formation-pitch" width="720" height="450" aria-label="Draggable player formation on a football pitch"></canvas>
+    <p class="section-note" data-i18n="dragNote">Drag a shirt to place it, or select a player to edit exact values.</p>
+    <canvas id="formation-pitch" width="720" height="450" data-i18n-aria="pitchAria" aria-label="Draggable player formation on a football pitch"></canvas>
     <div class="formation-controls">
-     <div id="player-list" class="player-list" aria-label="Select a player"></div>
+     <div id="player-list" class="player-list" data-i18n-aria="selectPlayerList" aria-label="Select a player"></div>
      <div class="player-fields">
-      <label>X position<input id="player-x" type="number" min="-160" max="160" step="1"></label>
-      <label>Y position<input id="player-y" type="number" min="-120" max="120" step="1"></label>
-      <label>Strength<input id="player-strength" type="number" min="1" max="10" step="1"></label>
+      <label><span data-i18n="xPosition">X position</span><input id="player-x" type="number" min="-160" max="160" step="1"></label>
+      <label><span data-i18n="yPosition">Y position</span><input id="player-y" type="number" min="-120" max="120" step="1"></label>
+      <label><span data-i18n="strength">Strength</span><input id="player-strength" type="number" min="1" max="10" step="1"></label>
      </div>
     </div>
    </section>
 
    <section class="steps-section" aria-labelledby="steps-heading">
     <div class="section-heading">
-     <div><span class="section-index">03</span><h2 id="steps-heading">Play instructions</h2></div>
-     <button id="add-step" class="quiet-button" type="button"><span aria-hidden="true">＋</span> Add step</button>
+     <div><span class="section-index">03</span><h2 id="steps-heading" data-i18n="playInstructions">Play instructions</h2></div>
+     <button id="add-step" class="quiet-button" type="button"><span aria-hidden="true">＋</span> <span data-i18n="addStep">Add step</span></button>
     </div>
-    <p class="section-note">Instructions run from top to bottom. Use the arrows to change their order.</p>
+    <p class="section-note" data-i18n="stepsNote">Instructions run from top to bottom. Use the arrows to change their order.</p>
     <div id="step-list" class="step-list"></div>
    </section>
   </div>
 
   <section class="export-section" aria-labelledby="export-heading">
-   <div class="section-heading"><div><span class="section-index">04</span><h2 id="export-heading">Save your tactic</h2></div></div>
+   <div class="section-heading"><div><span class="section-index">04</span><h2 id="export-heading" data-i18n="saveYourTactic">Save your tactic</h2></div></div>
    <div class="export-grid">
     <div class="save-actions">
-     <button id="save-tactic" class="primary-button" type="button">Save to this browser</button>
-     <button id="download-tactic" class="secondary-button" type="button">Download JSON</button>
+     <button id="save-tactic" class="primary-button" type="button" data-i18n="saveBrowser">Save to this browser</button>
+     <button id="download-tactic" class="secondary-button" type="button" data-i18n="downloadJson">Download JSON</button>
      <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
-     <p class="section-note">Browser-saved tactics appear in both match team selectors. JSON files can be shared or loaded on another device.</p>
+     <p class="section-note" data-i18n="saveNote">Browser-saved tactics appear in both match team selectors. JSON files can be shared or loaded on another device.</p>
     </div>
-    <label class="json-field">Live JSON preview<textarea id="json-preview" rows="12" readonly spellcheck="false"></textarea></label>
+    <label class="json-field"><span data-i18n="jsonPreview">Live JSON preview</span><textarea id="json-preview" rows="12" readonly spellcheck="false"></textarea></label>
    </div>
   </section>
  </main>
- <script type="module" src="dist/creator.js"></script>
+ <script type="module" src="dist/creator.js?v=3"></script>
 </body>
 </html>

@@ -1,12 +1,105 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Virtual football tournament</title><style>body{background:#101b16;color:#f4f6f2;font:16px system-ui;margin:32px auto;max-width:760px;padding:0 20px}h1{font-size:25px;margin-bottom:18px}p{color:#aebfb3}canvas{width:100%;max-width:600px;border-radius:0 0 8px 8px;display:block;margin:0 auto;background:#196c36}.match-view{max-width:600px;margin:24px auto}.scoreboard{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;padding:13px 18px;background:#172a20;border:1px solid #42664c;border-bottom:3px solid #8abf6c;border-radius:10px 10px 0 0;color:#fff}.team-score{display:flex;align-items:center;gap:8px;min-width:0;font-weight:800}.team-score.away{justify-content:flex-end}.team-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.score{font-size:22px;font-variant-numeric:tabular-nums;color:#ffdf77}.timer{text-align:center;min-width:78px;font-weight:800;font-size:23px;font-variant-numeric:tabular-nums}.timer-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#aebfb3;font-weight:700}.winner-banner{margin:12px auto 0;padding:18px 16px;text-align:center;border:2px solid #dfbf5a;border-radius:10px;background:linear-gradient(115deg,#273b26,#3c4b22,#273b26);box-shadow:0 8px 25px #0005;animation:winner-enter 850ms cubic-bezier(.2,1.5,.4,1) both}.winner-banner[hidden]{display:none}.winner-label{font-size:12px;font-weight:800;letter-spacing:3px;color:#f5d87e}.winner-name{font-size:clamp(24px,5vw,38px);font-weight:1000;color:white;text-shadow:0 2px 3px #0008;overflow-wrap:anywhere}.winner-trophy{font-size:28px;display:inline-block;animation:trophy-pop 1s ease-out both}@keyframes winner-enter{from{opacity:0;transform:translateY(20px) scale(.85)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes trophy-pop{0%{transform:rotate(-25deg) scale(0)}55%{transform:rotate(10deg) scale(1.25)}100%{transform:rotate(0) scale(1)}}@media(max-width:480px){.scoreboard{gap:6px;padding:10px 8px}.team-score{gap:4px;font-size:12px}.score{font-size:18px}.timer{min-width:60px;font-size:19px}}@media(prefers-reduced-motion:reduce){.winner-banner,.winner-trophy{animation:none}}.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}label{display:grid;gap:6px;font-size:13px}select,button{background:#263b2f;color:white;border:1px solid #54705d;border-radius:6px;padding:9px}button{cursor:pointer}.tactic-message.error{color:#ffb4a8}.footer{display:flex;justify-content:space-between;color:#aebfb3;font-size:13px}</style><h1>Virtual football tournament</h1><p>
-<button id="create-tactic" type="button">Create a tactic</button>
-<button id="game-control" type="button">Start</button>
-<button id="load-tactic" type="button">Load tactic</button>
-</p><div class="controls"><label>Home team<select id="a"></select></label><label>Away team<select id="b"></select></label><label>Speed<select id="speed">
-<option value="1">1×</option>
-<option value="5">5×</option>
-<option value="20">20×</option>
-</select>
-</label>
-<input id="tactic-file" type="file" accept=".json,application/json" hidden>
-<button id="audio-toggle" type="button" aria-label="Toggle MIDI sounds and music">🔊 Sound on</button></div><p id="tactic-message" class="tactic-message" hidden></p><div class="match-view"><div class="scoreboard" aria-label="Match scoreboard"><div class="team-score home"><span class="team-name" id="home-name"></span><span class="score" id="home-score">0</span></div><div class="timer"><span class="timer-label">Time</span><span id="match-timer">00:00</span></div><div class="team-score away"><span class="score" id="away-score">0</span><span class="team-name" id="away-name"></span></div></div><canvas width="600" height="400" aria-label="Football match"></canvas><div class="winner-banner" id="winner-banner" role="status" aria-live="polite" hidden><div class="winner-trophy" aria-hidden="true">🏆</div><div class="winner-label">MATCH WINNER</div><div class="winner-name" id="winner-name"></div></div></div><div class="footer"><span id="status">Ready to start</span><span id="coordinates">0, 0</span></div><p>Select tactics for both teams and press Start when you are ready. Each match lasts three simulated minutes. Sound starts automatically when your browser permits it.</p><script type="module" src="dist/browser.js?v=2"></script></html>
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title data-i18n="titleMatch">Virtual football tournament</title>
+ <style>
+  body{background:#101b16;color:#f4f6f2;font:16px system-ui;margin:0}
+  .topbar{height:64px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #34473b;background:#121d16;position:sticky;top:0;z-index:2}
+  .topbar-start{display:flex;align-items:center;gap:14px;min-width:0}
+  .locale-picker{display:flex;align-items:center;flex:0 0 auto}
+  .locale-picker select{background:#263b2f;color:#fff;border:1px solid #54705d;border-radius:6px;padding:7px 8px;font:700 13px system-ui;cursor:pointer}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .brand{display:flex;align-items:center;gap:8px;color:#f4f6f2;font-size:12px;font-weight:800;letter-spacing:1.2px;text-decoration:none;white-space:nowrap}
+  .brand-mark{display:grid;place-items:center;width:28px;height:28px;background:#d5e34b;color:#182018;font-weight:800}
+  .match-nav{display:flex;align-items:center;gap:16px}
+  .match-nav a{color:#d7dfd4;font-size:13px;text-decoration:none;white-space:nowrap}
+  .match-nav a:hover{color:#d5e34b}
+  .page{max-width:760px;margin:32px auto;padding:0 20px}
+  h1{font-size:25px;margin-bottom:18px}
+  p{color:#aebfb3}
+  canvas{width:100%;max-width:600px;border-radius:0 0 8px 8px;display:block;margin:0 auto;background:#196c36}
+  .match-view{max-width:600px;margin:24px auto}
+  .scoreboard{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;padding:13px 18px;background:#172a20;border:1px solid #42664c;border-bottom:3px solid #8abf6c;border-radius:10px 10px 0 0;color:#fff}
+  .team-score{display:flex;align-items:center;gap:8px;min-width:0;font-weight:800}
+  .team-score.away{justify-content:flex-end}
+  .team-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .score{font-size:22px;font-variant-numeric:tabular-nums;color:#ffdf77}
+  .timer{text-align:center;min-width:78px;font-weight:800;font-size:23px;font-variant-numeric:tabular-nums}
+  .timer-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#aebfb3;font-weight:700}
+  .winner-banner{margin:12px auto 0;padding:18px 16px;text-align:center;border:2px solid #dfbf5a;border-radius:10px;background:linear-gradient(115deg,#273b26,#3c4b22,#273b26);box-shadow:0 8px 25px #0005;animation:winner-enter 850ms cubic-bezier(.2,1.5,.4,1) both}
+  .winner-banner[hidden]{display:none}
+  .winner-label{font-size:12px;font-weight:800;letter-spacing:3px;color:#f5d87e}
+  .winner-name{font-size:clamp(24px,5vw,38px);font-weight:1000;color:white;text-shadow:0 2px 3px #0008;overflow-wrap:anywhere}
+  .winner-trophy{font-size:28px;display:inline-block;animation:trophy-pop 1s ease-out both}
+  @keyframes winner-enter{from{opacity:0;transform:translateY(20px) scale(.85)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes trophy-pop{0%{transform:rotate(-25deg) scale(0)}55%{transform:rotate(10deg) scale(1.25)}100%{transform:rotate(0) scale(1)}}
+  @media(max-width:640px){.topbar{height:auto;min-height:56px;flex-wrap:wrap;padding:10px 12px;row-gap:8px}.brand{font-size:10px;letter-spacing:.6px}.match-nav{gap:10px}.match-nav a{font-size:12px}}
+  @media(max-width:480px){.scoreboard{gap:6px;padding:10px 8px}.team-score{gap:4px;font-size:12px}.score{font-size:18px}.timer{min-width:60px;font-size:19px}}
+  @media(prefers-reduced-motion:reduce){.winner-banner,.winner-trophy{animation:none}}
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+  label{display:grid;gap:6px;font-size:13px}
+  .locale-picker{display:flex}
+  select,button{background:#263b2f;color:white;border:1px solid #54705d;border-radius:6px;padding:9px}
+  button{cursor:pointer}
+  .tactic-message.error{color:#ffb4a8}
+  .footer{display:flex;justify-content:space-between;color:#aebfb3;font-size:13px}
+ </style>
+</head>
+<body>
+ <header class="topbar">
+  <div class="topbar-start">
+   <label class="locale-picker">
+    <span class="sr-only" data-i18n="language">Language</span>
+    <select id="locale" data-i18n-aria="language" aria-label="Language">
+     <option value="en">English</option>
+     <option value="es">Español</option>
+     <option value="nl">Nederlands</option>
+    </select>
+   </label>
+   <a class="brand" href="index.html"><span class="brand-mark">11</span> TOUCHLINE / LAB</a>
+  </div>
+  <nav class="match-nav" data-i18n-aria="mainNav" aria-label="Main navigation">
+   <a href="tactics.html" data-i18n="navBuilder">Tactic builder</a>
+   <a href="manual.html" data-i18n="navManual">Tactic manual</a>
+  </nav>
+ </header>
+ <main class="page">
+  <h1 data-i18n="titleMatch">Virtual football tournament</h1>
+  <p>
+   <button id="create-tactic" type="button" data-i18n="createTactic">Create a tactic</button>
+   <button id="game-control" type="button" data-i18n="start">Start</button>
+   <button id="load-tactic" type="button" data-i18n="loadTactic">Load tactic</button>
+  </p>
+  <div class="controls">
+   <label><span data-i18n="homeTeam">Home team</span><select id="a"></select></label>
+   <label><span data-i18n="awayTeam">Away team</span><select id="b"></select></label>
+   <label><span data-i18n="speed">Speed</span><select id="speed">
+    <option value="1">1×</option>
+    <option value="5">5×</option>
+    <option value="20">20×</option>
+   </select></label>
+   <input id="tactic-file" type="file" accept=".json,application/json" hidden>
+   <button id="audio-toggle" type="button" data-i18n="soundOn" data-i18n-aria="soundToggle" aria-label="Toggle MIDI sounds and music">🔊 Sound on</button>
+  </div>
+  <p id="tactic-message" class="tactic-message" hidden></p>
+  <div class="match-view">
+   <div class="scoreboard" data-i18n-aria="scoreboard" aria-label="Match scoreboard">
+    <div class="team-score home"><span class="team-name" id="home-name"></span><span class="score" id="home-score">0</span></div>
+    <div class="timer"><span class="timer-label" data-i18n="time">Time</span><span id="match-timer">00:00</span></div>
+    <div class="team-score away"><span class="score" id="away-score">0</span><span class="team-name" id="away-name"></span></div>
+   </div>
+   <canvas width="600" height="400" data-i18n-aria="canvasMatch" aria-label="Football match"></canvas>
+   <div class="winner-banner" id="winner-banner" role="status" aria-live="polite" hidden>
+    <div class="winner-trophy" aria-hidden="true">🏆</div>
+    <div class="winner-label" data-i18n="winner">MATCH WINNER</div>
+    <div class="winner-name" id="winner-name"></div>
+   </div>
+  </div>
+  <div class="footer"><span id="status" data-i18n="ready">Ready to start</span><span id="coordinates">0, 0</span></div>
+  <p data-i18n="helpMatch">Select tactics for both teams and press Start when you are ready. Each match lasts three simulated minutes. Sound starts automatically when your browser permits it.</p>
+ </main>
+ <script type="module" src="dist/browser.js?v=3"></script>
+</body>
+</html>
