@@ -83,6 +83,7 @@ let pendingLoad = null;
 let tacticNotice = null, tacticNoticeError = false;
 function showTacticMessage(text, error = false) { tacticNotice = text; tacticNoticeError = error; tacticMessage.hidden = false; tacticMessage.textContent = text(); tacticMessage.classList.toggle('error', error); }
 function clearTacticMessage() { tacticNotice = null; tacticMessage.hidden = true; tacticMessage.textContent = ''; tacticMessage.classList.remove('error'); }
+const compactLayout = window.matchMedia('(max-width: 640px), (pointer: coarse)');
 function loadTacticOption(select) {
     let option = [...select.options].find(item => item.value === LOAD_TACTIC);
     if (!option) {
@@ -94,6 +95,19 @@ function loadTacticOption(select) {
     option.textContent = t('loadTactic');
     return option;
 }
+function syncLoadOptions() {
+    for (const select of [selectA, selectB]) {
+        if (compactLayout.matches) {
+            if (select.value === LOAD_TACTIC)
+                restoreTacticSelect(select);
+            select.querySelector(`option[value="${LOAD_TACTIC}"]`)?.remove();
+        }
+        else
+            loadTacticOption(select);
+    }
+}
+compactLayout.addEventListener('change', syncLoadOptions);
+window.addEventListener('resize', syncLoadOptions);
 function rememberTactic(id, tactic) {
     library.push({ id, tactic });
     for (const select of [selectA, selectB]) {
@@ -168,8 +182,7 @@ function refreshMatchChrome() {
         tacticMessage.textContent = tacticNotice();
         tacticMessage.classList.toggle('error', tacticNoticeError);
     }
-    for (const select of [selectA, selectB])
-        loadTacticOption(select);
+    syncLoadOptions();
 }
 gameControl.addEventListener('click', () => {
     if (game && !game.finished) {
@@ -189,6 +202,10 @@ for (const select of [selectA, selectB])
     select.addEventListener('change', () => {
         if (select.value !== LOAD_TACTIC) {
             previousTactic.set(select, select.value);
+            return;
+        }
+        if (compactLayout.matches) {
+            restoreTacticSelect(select);
             return;
         }
         pendingLoad = select;
@@ -508,10 +525,9 @@ async function loadBuiltInTactics() {
     }
     selectA.value = BUILTIN_TACTICS[0];
     selectB.value = BUILTIN_TACTICS[1];
-    for (const select of [selectA, selectB]) {
-        loadTacticOption(select);
+    syncLoadOptions();
+    for (const select of [selectA, selectB])
         previousTactic.set(select, select.value);
-    }
 }
 onLocaleChange(refreshMatchChrome);
 loadBuiltInTactics().then(() => { document.querySelector('#status').textContent = t('ready'); requestAnimationFrame(frame); }).catch(error => { console.error(error); showTacticMessage(() => t('missingBuiltin'), true); });
