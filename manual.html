@@ -7,21 +7,13 @@
  <link rel="stylesheet" href="tactics.css?v=3">
  <link rel="stylesheet" href="manual.css?v=3">
  <link rel="stylesheet" href="matchday-pages.css?v=1">
+ <link rel="stylesheet" href="topbar.css?v=1">
 </head>
 <body>
  <header class="topbar">
-  <div class="topbar-start">
-   <label class="locale-picker">
-    <span class="sr-only" data-i18n="language">Language</span>
-    <select id="locale" data-i18n-aria="language" aria-label="Language">
-     <option value="en">English</option>
-     <option value="es">Español</option>
-     <option value="nl">Nederlands</option>
-    </select>
-   </label>
-   <a class="brand" href="index.html"><span class="brand-mark">11</span> TOUCHLINE / LAB</a>
-  </div>
-  <nav class="manual-nav" data-i18n-aria="mainNav" aria-label="Main navigation"><a href="tactics.html" data-i18n="navBuilder">Tactic builder</a><a href="index.html" data-i18n="navMatch">Back to match</a></nav>
+  <div class="topbar-start"><a class="brand" href="index.html"><span class="brand-mark">11</span><span class="brand-words"><span class="brand-title">TOUCHLINE</span><span class="brand-subtitle">FOOTBALL LAB</span></span></a></div>
+  <nav class="app-nav" data-i18n-aria="mainNav" aria-label="Main navigation"><a href="index.html"><span class="nav-icon" aria-hidden="true">◉</span><span data-i18n="navMatch">Match center</span></a><a href="tactics.html"><span class="nav-icon" aria-hidden="true">▤</span><span data-i18n="navBuilder">Tactic builder</span></a><a href="manual.html" aria-current="page"><span class="nav-icon" aria-hidden="true">▣</span><span data-i18n="navManual">Tactic manual</span></a></nav>
+  <div class="topbar-actions"><label class="locale-picker"><span class="sr-only" data-i18n="language">Language</span><select id="locale" data-i18n-aria="language" aria-label="Language"><option value="en">English</option><option value="es">Español</option><option value="nl">Nederlands</option></select></label></div>
  </header>
  <main class="manual-main">
   <header class="page-heading manual-heading">
