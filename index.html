@@ -49,6 +49,7 @@
   .tactic-message.error{color:#ffb4a8}
   .footer{display:flex;justify-content:space-between;color:#aebfb3;font-size:13px}
  </style>
+ <link rel="stylesheet" href="matchday-home.css?v=1">
 </head>
 <body>
  <header class="topbar">
@@ -71,9 +72,11 @@
    <button id="audio-toggle" class="topbar-sound" type="button" data-i18n="soundOn" data-i18n-aria="soundToggle" aria-label="Toggle MIDI sounds and music">🔊 Sound on</button>
   </div>
  </header>
- <main class="page">
-  <h1 data-i18n="titleMatch">Virtual football tournament</h1>
-  <div class="controls">
+ <main class="page matchday-page">
+ <section class="hero"><div><span class="eyebrow">TOUCHLINE / MATCH CENTER</span><h1 data-i18n="titleMatch">Virtual football tournament</h1><p class="tagline">BUILD YOUR TACTICS. OWN THE PITCH.</p></div><div class="hero-number" aria-hidden="true">11</div></section>
+ <div class="dashboard">
+  <aside class="setup-card"><div class="card-head"><span class="step-badge">01</span><div><span class="eyebrow">PRE-MATCH</span><h2>Match setup</h2></div></div><p class="card-description">Choose your teams, set the pace and get ready for kick-off.</p>
+ <div class="controls">
    <label><span data-i18n="homeTeam">Home team</span><select id="a"></select></label>
    <label><span data-i18n="awayTeam">Away team</span><select id="b"></select></label>
    <label><span data-i18n="speed">Speed</span><select id="speed">
@@ -84,8 +87,12 @@
    <button id="game-control" type="button" data-i18n="start">Start</button>
    <input id="tactic-file" type="file" accept=".json,application/json" hidden>
   </div>
-  <p id="tactic-message" class="tactic-message" hidden></p>
-  <div class="match-view">
+  
+ <p id="tactic-message" class="tactic-message" hidden></p>
+  
+ <div class="sidebar-rule"></div><span class="eyebrow">YOUR PLAYBOOK</span><div class="quicklinks"><a href="tactics.html"><span data-i18n="navBuilder">Tactic builder</span><b>↗</b></a><a href="manual.html"><span data-i18n="navManual">Tactic manual</span><b>↗</b></a></div></aside>
+  <section class="match-card"><div class="card-head match-head"><div><span class="eyebrow">02 / MATCH CENTER</span><h2>Live match</h2></div><span class="live-pill">● MATCH DAY</span></div>
+ <div class="match-view">
    <div class="scoreboard" data-i18n-aria="scoreboard" aria-label="Match scoreboard">
     <div class="team-score home"><span class="team-name" id="home-name"></span><span class="score" id="home-score">0</span></div>
     <div class="timer"><span class="timer-label" data-i18n="time">Time</span><span id="match-timer">00:00</span></div>
@@ -98,9 +105,11 @@
     <div class="winner-name" id="winner-name"></div>
    </div>
   </div>
-  <div class="footer"><span id="status" data-i18n="ready">Ready to start</span><span id="coordinates">0, 0</span></div>
+  
+ <div class="match-details"><div class="footer"><span id="status" data-i18n="ready">Ready to start</span><span id="coordinates">0, 0</span></div>
   <p data-i18n="helpMatch">Select tactics for both teams and press Start when you are ready. Each match lasts three simulated minutes. Sound starts automatically when your browser permits it.</p>
- </main>
+ </main></div></section>
+ </div></main>
  <script type="module" src="dist/browser.js?v=5"></script>
 </body>
 </html>
