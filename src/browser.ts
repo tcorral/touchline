@@ -5,7 +5,7 @@ import {onLocaleChange,t} from './i18n.js';
 const audio=new GameAudio();
 const audioButton=document.querySelector<HTMLButtonElement>('#audio-toggle')!;
 let audioHint:'on'|'off'|'tap'='on';
-function paintAudio(){audioButton.textContent=audioHint==='on'?t('soundOn'):audioHint==='tap'?t('soundTap'):t('soundOff');}
+function paintAudio(){const label=audioHint==='on'?t('soundOn'):audioHint==='tap'?t('soundTap'):t('soundOff');audioButton.textContent=label;audioButton.setAttribute('aria-label',label);audioButton.title=label;audioButton.dataset.soundState=audioHint;audioButton.setAttribute('aria-pressed',String(audioHint==='on'));}
 const gameControl=document.querySelector<HTMLButtonElement>('#game-control')!;
 async function enableAudio(){try{await audio.enable();audioHint='on';paintAudio();if(game&&!paused&&!game.finished)audio.startMusic();}catch(error){console.error(error);audioHint='tap';paintAudio();}}
 audioButton.addEventListener('click',()=>{if(audio.enabled){audio.disable();audioHint='off';paintAudio();}else void enableAudio();});
